@@ -12,6 +12,8 @@ func RequestLogger(next http.Handler) http.Handler {
 			RequestURL: r.RequestURI,
 			IP:         r.RemoteAddr,
 		})
+
+		next.ServeHTTP(w, r)
 	}
 
 	return http.HandlerFunc(fn)

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"pong/log"
 	"pong/middlewares"
@@ -26,24 +24,34 @@ func main() {
 	// Setup Router
 	r := chi.NewRouter()
 
-	r.Use(middleware.RequestID,
+	r.Use(
+		middleware.RequestID,
 		middleware.RealIP,
 		middlewares.RequestLogger,
 		middleware.Recoverer,
 	)
 
-	r.Use(middleware.Timeout(60 * time.Second))
+	// r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/", routes.Routes)
 
-	port := 8080
+	// TODO: Do this only in dev mode
+	// Log out available routes
+	fmt.Println("Available Routes:")
+	chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		fmt.Printf("[%s]: '%s' has %d middlewares\n", method, route, len(middlewares))
+		return nil
+	})
+	fmt.Println()
 
-	server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r}
+	port := fmt.Sprintf(":%d", 8080)
+
+	// server := &http.Server{Addr: port, Handler: r}
 
 	go func() {
-		log.Info(fmt.Sprintf("starting server on port :%d", port))
+		log.Info(fmt.Sprintf("starting server on port %s", port))
 
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := http.ListenAndServe(port, r); err != nil && err != http.ErrServerClosed {
 			log.Errorf("fatal error while starting server", log.LogFields{Error: err})
 			panic("stopping server")
 		}
@@ -56,8 +64,8 @@ func main() {
 
 	log.Info("shutting down server")
 
-	if err := server.Shutdown(context.Background()); err != nil {
-		log.Errorf("error while shutting down server", log.LogFields{Error: err})
-		panic("force stopping server")
-	}
+	// if err := server.Shutdown(context.Background()); err != nil {
+	// 	log.Errorf("error while shutting down server", log.LogFields{Error: err})
+	// 	panic("force stopping server")
+	// }
 }
