@@ -1,14 +1,21 @@
 package log
 
 import (
+	"pong/config"
+
 	"go.uber.org/zap"
 )
 
 var L *zap.Logger
 
-func Init() error {
+func Init() (err error) {
+	var logger *zap.Logger
 
-	logger, err := zap.NewDevelopment()
+	if config.Env == "prod" {
+		logger, err = zap.NewProduction()
+	} else {
+		logger, err = zap.NewDevelopment()
+	}
 
 	if err != nil {
 		return err
@@ -25,6 +32,10 @@ func Info(msg string) {
 
 func Infof(msg string, fields LogFields) {
 	L.Info(msg, fields.GetInlineObj())
+}
+
+func Error(msg string) {
+	L.Error(msg)
 }
 
 func Errorf(msg string, fields LogFields) {

@@ -17,6 +17,9 @@ WORKDIR /app
 
 COPY --from=build /app/pong /app/
 
+ENV PORT 80
+ENV ENV prod
+
 EXPOSE 80
 
 CMD /app/pong
