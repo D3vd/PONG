@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"pong/log"
+	"pong/routes"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -30,6 +31,8 @@ func main() {
 	r.Use(middleware.Recoverer)
 
 	r.Use(middleware.Timeout(60 * time.Second))
+
+	r.Route("/", routes.Routes)
 
 	port := 8080
 
