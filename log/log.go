@@ -30,3 +30,7 @@ func Infof(msg string, fields LogFields) {
 func Errorf(msg string, fields LogFields) {
 	L.Error(msg, fields.GetInlineObj())
 }
+
+func Request(fields RequestFields) {
+	L.Info("", fields.GetInlineObj())
+}

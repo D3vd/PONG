@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"pong/log"
+	"pong/middlewares"
 	"pong/routes"
 
 	"github.com/go-chi/chi"
@@ -25,10 +26,11 @@ func main() {
 	// Setup Router
 	r := chi.NewRouter()
 
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+	r.Use(middleware.RequestID,
+		middleware.RealIP,
+		middlewares.RequestLogger,
+		middleware.Recoverer,
+	)
 
 	r.Use(middleware.Timeout(60 * time.Second))
 
